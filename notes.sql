@@ -40,6 +40,7 @@ SELECT DISTINCT Species FROM Bird_nests;
 -- Can also get distinct pairs or tuples that occur
 SELECT DISTINCT Scientific_name FROM Bird_nests, Species
 
+-- Order, sort by, arrange
 -- Can ask that the reuslts be ordered
 SELECT Scientific_name FROM Species;
 SELECT Scientfic_name FROM Species ORDER BY Scientific_name;
@@ -180,3 +181,41 @@ SELECT * FROM Bird_nests AS BN JOIN Species AS S
 -- You can also leave out the AS if you want
 SELECT * FROM Bird_nests BN JOIN Species S
     ON BN.Speices = S.Code;
+
+--- April 20th, 2026 ---
+-- First review item: tri-value logic
+-- Expression can have a value (if Boolean, TRUE or JALSE), but they can also be NULL
+-- In selecting rows, NULL doesn't cut it, NULL doesn't count as TRUE
+
+SELECT COUNT(*) FROM Bird_nests
+    WHERE floatAge < 7 OR FloatAge >= 7; -- We'd think this would give us every row, but it didn't give us the NULLs
+
+SELECT COUNT(*) FROM Bird_nests
+    WHERE floatAge = NULL; -- WRONG WRONG WRONG WRONG WRONG
+
+SELECT COUNT(*) FROM Bird_nests
+    WHERE floatAge IS NULL; -- RIGHT RIGHT RIGHT RIGHT RIGHT
+
+-- Everything is a table!
+SELECT COUNT(*) FROM Bird_nests;
+-- We looked at one example of nesting SELECTs
+
+SELECT Scientific_name
+    FROM Species
+    WHERE Code NOT IN ( SELECT DISTINCT Species FROM Bird_nests);
+
+-- Let's pretend that SQL didn't have a HAVING clause.  Could we somehow get the same functionality?
+-- Let's go back to the example where we used a HAVING clause
+
+SELECT Location, MAX(Area) AS Max_area
+    FROM Site
+    WHERE Location LIKE '%Canada'
+    GROUP BY Location
+    HAVING Max_area > 200;
+
+-- Conceptually, WHERE and HAVING do the same exact thing - WHERE is for rows, HAVING is for groups
+
+-- As a reminder, the Site table:
+SELECT * FROM Site LIMIT 5;
+
+___
