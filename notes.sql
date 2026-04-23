@@ -218,4 +218,162 @@ SELECT Location, MAX(Area) AS Max_area
 -- As a reminder, the Site table:
 SELECT * FROM Site LIMIT 5;
 
-___
+SELECT Location, MAX(Area) AS Max_area
+
+SELECT * FROM
+    (SELECT Location, MAX(Area) AS Max_area
+     FROM Site
+     WHERE Location LIKE '%Canada'
+     GROUP BY Location)
+    WHERE Max_area > 200;
+
+-- REVIEWING AND CONTINUING DISCUSSION OF JOINS
+
+-- In some databases, to dod a Cartesian product you would just do a JOIN without a contition, e.g.,
+SELECT * FROM A JOIN B;
+-- **But** in DUCKdb, you have to say:
+SELECT * FROM A CROSS JOIN B;
+SELECT * FROM A;
+SELECT * FROM B;
+
+-- Here's what the Cartesian product looks like:
+SELECT * FROM A CROSS JOIN B;
+
+-- Lets a join cndition, which can be *any* expression!
+SELECT * FROM A JOIN B ON acol1 < bcol1;
+
+-- This is what's referred to as an INNER JOIN
+SELECT * FROM A INNER JOIN B ON acol1 < bcol1;
+
+-- Outer join: we're adding rows from one table that never got matched.
+SELECT * FROM A RIGHT JOIN B ON acol1 < bcol2;
+
+-- Just for completeness (this way more rare that you would want to do this):
+SELECT * FROM A FULL OUTER JOIN B ON acol1 < bcol1;
+
+-- Now, joining on a foreign key relationship is way more common
+
+SELECT * FROM House;
+SELECT * FROM Student;
+
+    -- Typical thing to do:
+SELECT * FROM Student S Join House H ON S.House_ID = H.House_ID;
+
+-- One nice benefit of joining on a column that has the same name (i.e., House_ID here)
+-- is you can use USING clause
+SELECT * FROM Student JOIN House USING (House_ID);
+
+-- Meanwhile, back in the bird database:
+SELECT COUNT(*) FROM Bird_eggs;
+
+-- For better viewing:
+.mode line
+
+SELECT * FROM Bird_eggs LIMIT 1;
+SELECT * FROM Bird_eggs JOIN Bird_nests USING (Nest_ID) LIMIT 1;
+SELECT COUNT(*) FROM Bird_eggs JOIN Bird_nests USING (Nest_ID);
+.mode duckbox 
+
+-- Important point!!! Ordering is assuredly lost doing a JOIN. So don't say this:
+-- Ordering hsould always and only be the very last thing
+SELECT * FROM
+    (SELECT * FROM Bird_eggs ORDER BY Width)
+    JOIN Bird_nests
+    USING (Nest_ID); -- WRONG WRONG WRONG WRONG WRONG
+
+-- Gotcha with DuckDB... it's not as smart as some other databases
+SELECT Nest_ID, COUNT(*)
+    FROM Bird_nests JOIN Bird_eggs USING (Nest_ID)
+    GROUP BY Nest_ID;
+
+-- Some databases allow you to say: 
+SELECT Nest_ID, Species, COUNT(*)
+    FROM Bird_nests JOIN Bird_eggs USING (Nest_ID)
+    GROUP BY Nest_ID; -- This throws an error
+
+-- Workaround
+SELECT Nest_ID, ANY_VALUE(Species), COUNT(*)
+    FROM Bird_eggs JOIN Bird_nests USING (Nest_ID)
+    GROUP BY Nest_ID;
+
+SELECT Nest_ID, ANY_VALUE(Species), COUNT(*)
+    FROM Bird_eggs JOIN Bird_nests USING (Nest_ID)
+    GROUP BY Nest_ID, Species;
+
+SELECT Nest_ID, Species, Egg_num, Width, Length FROM
+    Bird_eggs JOIN Bird_nests USING (Nest_ID)
+    ORDER BY Nest_ID, Egg_num
+    LIMIT 10;
+
+---- April 22nd, 2026
+-- In toy.duckdb
+
+SELECT * FROM A;
+SELECT * FROM B;
+
+SELECT * FROM A CROSS JOIN B;
+
+SELECT acol1, acol2 FROM (SELECT * FROM A CROSS JOIN B);
+
+-- A Cross Join combines every row from table a with every row from table B
+-- if A has 4 rows and B has 3, A CROSS JOIN B will have 12 
+SELECT acol1, ANY_VALUE(acol2), COUNT(*)
+    FROM (SELECT * FROM A CROSS JOIN B)
+    GROUP BY acol1;
+
+-- 
+SELECT acol1, ANY_VALUE(acol2), COUNT(bcol3)
+    FROM (SELECT * FROM A CROSS JOIN B)
+    GROUP BY acol1;
+
+-- Using a condition
+SELECT * FROM A JOIN B ON aco1 < bcol1
+
+-- INNER or OUTER JOINS
+SELECT * FROM Student;
+SELECT * FROM HOUSE;
+-- Both tables have House_ID
+--INNER 
+SELECT * FROM Student AS S JOIN House AS H ON S.House_ID = H.House_ID;
+-- Same thing as above, but compact
+SELECT * FROM Student JOIN House USING (House_ID);
+
+SELECT * FROM Student LEFT JOIN House USING (House_ID);
+
+--- Now we're moving to our database database to create a database or something
+--- Creating a table
+CREATE TABLE Snow_cover (
+    Site VARCHAR NOT NULL,
+    Year INTEGER NOT NULL CHECK (Year BETWEEN 1990 AND 2018),
+    Date DATE NOT NULL,
+    Plot VARCHAR NOT NULL,
+    Location VARCHAR NOT NULL,
+    Snow_cover REAL CHECK (Snow_cover BETWEEN 0 AND 130),
+    Water_cover REAL CHECK (Water_cover BETWEEN 0 AND 130),
+    Land_cover REAL CHECK (Land_cover BETWEEN 0 AND 130),
+    Total_cover REAL CHECK (Total_cover BETWEEN 0 AND 130),
+    Observer VARCHAR,
+    Notes VARCHAR,
+    PRIMARY KEY (Site, Plot, Location, Date),
+    FOREIGN KEY (Site) REFERENCES Site (Code)
+);
+
+SELECT * FROM  Camp_Assignment LIMIT (5);
+SELECT * FROM Personnel LIMIT (5);
+--Get me three columns from 
+
+CREATE TEMP TABLE Camp_assignment_copy AS
+   SELECT * FROM Camp_assignment; 
+
+SELECT Year, Site, Name 
+   FROM Camp_assignment_copy JOIN Personnel ON Observer = Abbreviation;
+
+CREATE TEMP TABLE Camp_personnel_tmp AS
+   SELECT Year, Site, Name 
+   FROM Camp_assignment_copy JOIN Personnel ON Observer = Abbreviation;
+
+CREATE VIEW Camp_personnel_v AS
+   SELECT Year, Site, Name 
+   FROM Camp_assignment_copy JOIN Personnel ON Observer = Abbreviation;
+
+SELECT view_name FROM duckdb_views;

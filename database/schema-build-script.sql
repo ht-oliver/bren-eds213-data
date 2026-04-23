@@ -72,5 +72,5 @@ CREATE TABLE Bird_eggs (
     PRIMARY KEY (Nest_ID, Egg_num),
     FOREIGN KEY (Site) REFERENCES Site (Code),
     FOREIGN KEY (Nest_ID) REFERENCES Bird_nests (Nest_ID)
-);
+)
 COPY Bird_eggs FROM 'ASDN_Bird_eggs.csv' (header TRUE);
