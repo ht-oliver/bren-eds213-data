@@ -1,0 +1,51 @@
+1) 
+ls
+a.csv   b.csv   c.csv   d.csv   e.csv
+
+ls .
+a.csv   b.csv   c.csv   d.csv   e.csv
+
+ls "$(pwd)/../for_bash_essentials"
+a.csv   b.csv   c.csv   d.csv   e.csv
+
+These all give the same output - the third one is going up directory, and then back down into 'for_bash_essentials'
+
+
+2)
+wc -l *.csv
+cat *.csv | wc -l
+
+cat concatenates all of the line values and adds them together
+
+
+3)
+cat *.csv | wc -l a.csv
+
+This returns '3' because it's only counting the rows in a.csv
+because we specified this csv at the end of the command
+
+4)
+echo "${name}_Howard"
+
+
+5)
+$1 would be a.csv (the first filename), and $# would be the number of arguments (5)
+
+
+6)
+$1 "$(date)" is a full date, a single argument
+$3 would be the third part of a full date string, just a single word or digit
+
+7)
+I get a blank return when I run 'sort junk_file.txt > junk_file.txt'
+because junk_file > junk_file empties the file so there's nothing to sort
+To correct to
+sort junk_file.txt > sorted.text
+mv sorted.txt junk_file.txt
+
+Create a temp file, then overwrite the old one
+
+
+8)
+rm * .csv
+Will remove EVERYTHING, and then try to delete a file named '.csv'

@@ -1,0 +1,80 @@
+---
+title: "dbplyr"
+format: html
+---
+
+```{r}
+library(tidyverse)
+library(DBI)
+library(duckdb)
+library(dbplyr)
+```
+
+```{r}
+conn <- DBI::dbConnect(duckdb::duckdb(),
+                       dbdir = "database/database.duckdb")
+
+conn
+```
+
+
+```{r}
+DBI::dbListTables(conn)
+```
+
+```{r}
+# Pull species table from database
+species <- tbl(conn, "Species")
+species
+```
+
+```{r}
+# Select table with a query - some format difference
+species_a <- dbGetQuery(conn, "SELECT * FROM Species WHERE Code LIKE 'a%'")
+
+species_a
+```
+
+```{r}
+species %>% 
+  filter(Relevance == "Study species") %>% 
+  select(Code, Scientific_name) %>% 
+  arrange(Scientific_name) %>% 
+  head(3)
+```
+
+Let's do a summarize
+```{r}
+
+species %>% 
+  group_by(Relevance) %>% 
+  summarise(count()) %>% 
+  collect()
+```
+
+
+Let's do a mutate
+```{r}
+species %>% 
+  mutate(Xcode = paste("X_", Code)) %>% 
+  collect()
+```
+Let's do a join:
+```{r}
+eggs_db <- tbl(conn, "Bird_eggs")
+nest_db <- tbl(conn, "Bird_nests")
+```
+
+```{r}
+nest_db %>% 
+  left_join(eggs_db, b = "Nest_ID", keep = FALSE) %>% 
+  head(5) %>% 
+  collect()
+
+```
+## Closing the connection!
+
+```{r}
+DBI::dbDisconnect(conn, shutdown = TRUE)
+```
+

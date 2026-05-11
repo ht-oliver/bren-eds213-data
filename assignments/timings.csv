@@ -1,0 +1,6 @@
+test,0.003
+with_index_a,0
+with_index_a,.0400000
+subquery,.0400000
+outer_join,.0390000
+except,.0410000

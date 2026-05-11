@@ -377,3 +377,10 @@ CREATE VIEW Camp_personnel_v AS
    FROM Camp_assignment_copy JOIN Personnel ON Observer = Abbreviation;
 
 SELECT view_name FROM duckdb_views;
+
+
+---- Missed class
+SELECT Camp_assignment.Site FROM Camp_assignment
+UNION
+SELECT Code FROM Site AS Site;
+
