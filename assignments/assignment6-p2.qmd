@@ -17,7 +17,7 @@ GROUP BY p.Name
 HAVING COUNT(*) = 36;
 ```
 
-Return: Name (varchar): Emilie D'Astrous
+Output: Name (varchar): Emilie D'Astrous
 
 Is the SQL correct against the given schema?
 Answer: Yes
@@ -47,7 +47,7 @@ HAVING
     COUNT(bn.Nest_ID) = 36;
 ```
 
-Return: Name (varchar): 0
+Output: Name (varchar): 0
 
 Is the SQL correct against the given schema?
 Answer: No
@@ -69,7 +69,7 @@ GROUP BY p.Name
 HAVING COUNT(*) = 36;
 ```
 
-Return: Name (varchar): Emilie D'Astrous
+Output: Name (varchar): Emilie D'Astrous
         nest_count (int64): 36
         
 Is the SQL correct against the given schema?
