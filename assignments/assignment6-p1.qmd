@@ -1,0 +1,55 @@
+---
+title: "assignment6-p1"
+format: html
+---
+
+```{r}
+library(duckdb)
+library(dbplyr)
+library(tidyverse)
+library(DBI)
+```
+
+
+```{r}
+conn <- dbConnect(duckdb(), "../database/database.duckdb")
+egg_table <- tbl(conn, "Bird_eggs")
+personnel <- tbl(conn, "Personnel")
+bird_nests <- tbl(conn, "Bird_nests")
+```
+
+```{r}
+# Find out who measured the most eggs
+egg_table %>% 
+  left_join(bird_nests, by = "Nest_ID") %>% # join "bird_eggs" to "observer"
+  group_by(Observer) %>% 
+  summarise(total_eggs = n()) %>% # Group by observer and summarize eggs measured
+  left_join(personnel, by = c("Observer" = "Abbreviation")) %>%
+  select(Name, total_eggs) %>% 
+  arrange(desc(total_eggs)) %>% 
+  head(3) 
+```
+
+```{r}
+egg_table %>% 
+  left_join(bird_nests, by = "Nest_ID") %>% # join "bird_eggs" to "observer"
+  group_by(Observer) %>% 
+  summarise(total_eggs = n()) %>% # Group by observer and summarize eggs measured
+  left_join(personnel, by = c("Observer" = "Abbreviation")) %>%
+  select(Name, total_eggs) %>% 
+  arrange(desc(total_eggs)) %>% 
+  head(3)%>% 
+  # Get the query 
+  show_query()
+
+```
+
+Did `dbplyr` create a temporary table? Ord id it manage to do everything in one query?
+
+Answer: It did everything in one query. There potentially could have been less code if a temporary view was created, but dbplyr did it in one go.
+
+
+Did it limit to the first three rows us an R expression or an SQL LIMIT clause?
+
+Answer: It used an SQL limit clause
+

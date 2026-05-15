@@ -1,0 +1,81 @@
+---
+title: "assignment6-p2"
+format: html
+---
+
+## Chat GPT
+
+```{sql}
+SELECT p.Name
+FROM Bird_nests bn
+JOIN Personnel p
+  ON bn.Observer = p.Abbreviation
+WHERE bn.Site = 'nome'
+  AND bn.Year BETWEEN 1998 AND 2008
+  AND bn.ageMethod = 'float'
+GROUP BY p.Name
+HAVING COUNT(*) = 36;
+```
+
+Return: Name (varchar): Emilie D'Astrous
+
+Is the SQL correct against the given schema?
+Answer: Yes
+
+Does the SQL represent a good understanding of the database?
+Answer: Yes. Data types are treated appropriately, and SQL is not over-verbose or redundant.
+
+
+## Gemini
+
+```{sql}
+SELECT 
+    p.Name
+FROM 
+    Bird_nests bn
+JOIN 
+    Personnel p ON bn.Observer = p.Abbreviation
+JOIN 
+    Site s ON bn.Site = s.Code
+WHERE 
+    s.Site_name = 'nome' 
+    AND bn.Year BETWEEN 1998 AND 2008
+    AND bn.ageMethod = 'float'
+GROUP BY 
+    p.Name
+HAVING 
+    COUNT(bn.Nest_ID) = 36;
+```
+
+Return: Name (varchar): 0
+
+Is the SQL correct against the given schema?
+Answer: No
+
+Does the SQL represent a good understanding of the database?
+
+Answer: The SQL made the exact error mentioned in the assignment, using Count(bn.Nest_ID) instead of COUNT(*). Also, Gemini didn't catch that the site name is 'Nome', not 'nome' when accessed the way that Gemini accessed it. Not good understanding.
+
+## Claude
+
+```{sql}
+SELECT p.Name, COUNT(*) AS nest_count
+FROM Bird_nests n
+JOIN Personnel p ON n.Observer = p.Abbreviation
+WHERE n.Site = 'nome'
+  AND n.Year BETWEEN 1998 AND 2008
+  AND n.ageMethod = 'float'
+GROUP BY p.Name
+HAVING COUNT(*) = 36;
+```
+
+Return: Name (varchar): Emilie D'Astrous
+        nest_count (int64): 36
+        
+Is the SQL correct against the given schema?
+Answer: Yes
+        
+Does the SQL represent a good understanding of the database?
+Answer: Yes, it's clean and uses minimal steps. The tables are used effectively, instead of accessing columns that have different text formats like Gemini did. I'd say this one has good understanding.
+
+
